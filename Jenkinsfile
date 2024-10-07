@@ -1,16 +1,24 @@
 pipeline {
     agent any
     stages {
-        stage("Checkout") {
+        stage("build") {
             steps {
-                echo "Cloning the repository..."
-                checkout scm
+                echo "build..."
+                docker -composer build
             }
         }
-        stage("Run Tests") {
+        stage("Tests") {
             steps {
-                echo "Running test.js..."
-                sh 'node test.js'
+                echo " test..."
+                docker-compose -f docker-compose-tests.yml up --exit-code-from SumaTest SumaTest
+            }
+        }
+    }
+        stage("deploy") {
+            steps {
+                echo " deploy..."
+                docker-compose up -d --forse-recreate Suma
+                docker-compose up -d --forse-recreate SitioWeb
             }
         }
     }
