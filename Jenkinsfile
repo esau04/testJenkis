@@ -1,24 +1,28 @@
 pipeline {
     agent any
     stages {
-        stage("build") {
+        stage('Checkout') {
             steps {
-                echo "build..."
-                docker -composer build
+                echo 'Cloning the repository...'
+                git 'https://github.com/esau04/testJenkis.git'
             }
         }
-        stage("Tests") {
+        stage('Build') {
             steps {
-                echo " test..."
-                docker-compose -f docker-compose-tests.yml up --exit-code-from SumaTest SumaTest
+                echo 'Building docker images...'
+                sh 'docker-compose build'
             }
         }
-    }
-        stage("deploy") {
+        stage('Run Tests') {
             steps {
-                echo " deploy..."
-                docker-compose up -d --forse-recreate Suma
-                docker-compose up -d --forse-recreate SitioWeb
+                echo 'Running tests...'
+                sh 'docker-compose up --exit-code-from SumaTest SumaTest'
+            }
+        }
+        stage('Deploy') {
+            steps {
+                echo 'Deploying...'
+                // Aquí irían tus pasos de despliegue
             }
         }
     }
